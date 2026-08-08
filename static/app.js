@@ -276,6 +276,198 @@ function showPage(name) {
   if (name === 'report') renderReport();
   if (name === 'profile') renderProfile();
   if (name === 'internships') renderStudentInternships();
+  if (name === 'syllabus') renderStudentSyllabus();
+}
+
+// ── SYLLABUS & ADAPTIVE AI REMEDIAL ENGINE ─────────
+let currentSyllabusQuiz = [];
+let currentSyllabusQuizAnswers = {};
+
+async function renderStudentSyllabus() {
+  const container = document.getElementById('student-syllabus-container');
+  if (!container) return;
+  container.innerHTML = '<div style="text-align:center;padding:30px;color:#64748b">Loading curriculum syllabus...</div>';
+
+  const syllabi = await EA.getSyllabi();
+  if (!syllabi || !syllabi.length) {
+    container.innerHTML = '<p class="text-muted">No syllabus found.</p>';
+    return;
+  }
+
+  const syl = syllabi[0];
+  container.innerHTML = `
+    <div style="padding:16px;background:#eef2ff;border:1px solid #c7d2fe;border-radius:12px;margin-bottom:16px">
+      <div style="font-weight:800;font-size:16px;color:#1e1b4b">${syl.title}</div>
+      <div style="font-size:12px;color:#4338ca;margin-top:2px">Code: <strong>${syl.code}</strong> · ${syl.department} · Author: ${syl.author}</div>
+      <div style="font-size:12px;color:#475569;margin-top:6px">${syl.description}</div>
+    </div>
+
+    ${syl.units.map(u => `
+      <div class="card" style="margin-bottom:14px;border-left:4px solid #6366f1">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div>
+            <div style="font-weight:700;font-size:15px;color:#1e1b4b">${u.title}</div>
+            <div style="font-size:12px;color:#64748b;margin-top:4px">${u.description}</div>
+          </div>
+          <button class="btn btn-indigo btn-sm" onclick="startSyllabusQuiz('${u.unit_id}', '${u.title.replace(/'/g, "\\'")}', '${u.concepts.join(',')}')">
+            ⚡ Generate AI Quiz
+          </button>
+        </div>
+
+        <div style="margin-top:12px;padding:10px;background:#f8fafc;border-radius:8px">
+          <div style="font-size:11px;font-weight:700;color:#475569;text-transform:uppercase;margin-bottom:4px">Target Learning Goals:</div>
+          <ul style="font-size:12px;color:#64748b;padding-left:16px;margin:0">
+            ${u.learning_goals ? u.learning_goals.map(g => `<li>${g}</li>`).join('') : '<li>Master core concepts</li>'}
+          </ul>
+        </div>
+      </div>
+    `).join('')}
+  `;
+}
+
+async function startSyllabusQuiz(unitId, unitTitle, conceptsStr) {
+  const quizArea = document.getElementById('student-syllabus-quiz-area');
+  if (!quizArea) return;
+
+  quizArea.innerHTML = '<div style="text-align:center;padding:40px;color:#64748b">🧠 AI is analyzing syllabus unit and generating custom diagnostic quiz...</div>';
+
+  const concepts = conceptsStr ? conceptsStr.split(',') : [];
+  currentSyllabusQuiz = await EA.generateSyllabusQuiz(unitId, unitTitle, concepts);
+  currentSyllabusQuizAnswers = {};
+
+  if (!currentSyllabusQuiz || !currentSyllabusQuiz.length) {
+    quizArea.innerHTML = '<p class="text-muted">Failed to generate quiz. Please try again.</p>';
+    return;
+  }
+
+  quizArea.style.display = 'block';
+  quizArea.innerHTML = `
+    <div style="margin-bottom:16px;padding-bottom:12px;border-bottom:1.5px solid #e2e8f0">
+      <div style="font-weight:800;font-size:16px;color:#1e1b4b">⚡ AI Diagnostic Quiz: ${unitTitle}</div>
+      <div style="font-size:12px;color:#64748b">Answer the questions below to test your understanding. AI will evaluate gaps in real time.</div>
+    </div>
+
+    ${currentSyllabusQuiz.map((q, idx) => `
+      <div style="padding:14px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;margin-bottom:14px">
+        <div style="font-weight:700;font-size:14px;color:#1e1b4b;margin-bottom:10px">Q${idx + 1}. ${q.q}</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          ${q.opts.map((opt, optIdx) => `
+            <label style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:#fff;border:1px solid #cbd5e1;border-radius:8px;cursor:pointer;font-size:13px">
+              <input type="radio" name="syl_q_${idx}" value="${optIdx}" onchange="currentSyllabusQuizAnswers[${idx}]=${optIdx}">
+              <span>${opt}</span>
+            </label>
+          `).join('')}
+        </div>
+      </div>
+    `).join('')}
+
+    <button class="btn btn-indigo" style="width:100%;margin-top:10px" onclick="submitSyllabusQuiz()">
+      🧠 Submit & Generate AI Remedial Analysis
+    </button>
+  `;
+}
+
+async function submitSyllabusQuiz() {
+  const quizArea = document.getElementById('student-syllabus-quiz-area');
+  if (!quizArea) return;
+
+  quizArea.innerHTML = '<div style="text-align:center;padding:40px;color:#64748b">⏳ AI is analyzing your responses and generating personalized remedial explanations...</div>';
+
+  const result = await EA.evaluateRemedialQuiz(currentSyllabusQuiz, currentSyllabusQuizAnswers);
+
+  const scoreBadgeColor = result.score_pct >= 80 ? '#10b981' : result.score_pct >= 50 ? '#f59e0b' : '#ef4444';
+
+  let breakdownHTML = result.detailed_breakdown.map(b => `
+    <div style="padding:12px;border:1px solid ${b.is_correct ? '#bbf7d0' : '#fecaca'};background:${b.is_correct ? '#f0fdf4' : '#fef2f2'};border-radius:8px;margin-bottom:10px;font-size:13px">
+      <div style="font-weight:700;color:${b.is_correct ? '#166534' : '#991b1b'}">${b.is_correct ? '✓ Correct' : '✗ Needs Improvement'} — Q: ${b.question}</div>
+      <div style="color:#475569;margin-top:4px">Your Answer: <strong>${b.user_answer}</strong> | Correct: <strong>${b.correct_answer}</strong></div>
+      <div style="font-size:12px;color:#334155;margin-top:6px;padding:8px;background:#fff;border-radius:6px">💡 <strong>AI Explanation:</strong> ${b.explanation}</div>
+    </div>
+  `).join('');
+
+  let remedialHTML = '';
+  if (result.needs_improvement && result.remedial_lessons && result.remedial_lessons.length > 0) {
+    remedialHTML = `
+      <div style="margin-top:20px;padding:16px;background:#fffbeb;border:1.5px solid #fde68a;border-radius:12px">
+        <div style="font-weight:800;font-size:16px;color:#92400e;margin-bottom:8px">💡 AI Topic Explanation & Step-by-Step Breakdown</div>
+        <p style="font-size:12px;color:#78350f;margin-bottom:12px">AI identified key concept gaps in your quiz submission. Review the detailed explanations below to strengthen your understanding:</p>
+
+        ${result.remedial_lessons.map(l => `
+          <div style="padding:12px;background:#fff;border:1px solid #fcd34d;border-radius:8px;margin-bottom:10px">
+            <div style="font-weight:700;font-size:14px;color:#b45309">${l.title}</div>
+            <div style="font-size:13px;color:#451a03;margin-top:4px">${l.explanation}</div>
+            <div style="margin-top:6px;padding:6px 10px;background:#fef3c7;border-radius:6px;font-family:monospace;font-size:12px;color:#92400e">
+              📐 Formula / Rule: <strong>${l.formula}</strong>
+            </div>
+          </div>
+        `).join('')}
+
+        <button class="btn btn-amber" style="width:100%;margin-top:10px" onclick="startTargetedRemedialQuiz()">
+          🚀 Take Follow-Up Targeted Practice Quiz
+        </button>
+      </div>
+    `;
+  } else if (!result.needs_improvement) {
+    remedialHTML = `
+      <div style="margin-top:20px;padding:16px;background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:12px;text-align:center">
+        <div style="font-size:32px;margin-bottom:4px">🎉 🏆</div>
+        <div style="font-weight:800;font-size:16px;color:#166534">Outstanding Concept Mastery!</div>
+        <div style="font-size:13px;color:#15803d;margin-top:4px">You scored ${result.score_pct}%! You have mastered this syllabus unit and are ready to advance to the next unit.</div>
+      </div>
+    `;
+  }
+
+  window._lastRemedialQuizQuestions = result.remedial_quiz_questions || [];
+
+  quizArea.style.display = 'block';
+  quizArea.innerHTML = `
+    <div style="text-align:center;padding:16px;background:#f8fafc;border-radius:12px;margin-bottom:16px">
+      <div style="font-size:12px;color:#64748b;text-transform:uppercase;font-weight:700">Quiz Accuracy Score</div>
+      <div style="font-size:36px;font-weight:900;color:${scoreBadgeColor}">${result.score_pct}%</div>
+      <div style="font-size:13px;color:#475569">${result.correct_count} of ${result.total_questions} Questions Correct</div>
+    </div>
+
+    <div style="font-weight:700;font-size:14px;color:#1e1b4b;margin-bottom:10px">Detailed Question Diagnostics:</div>
+    ${breakdownHTML}
+    ${remedialHTML}
+  `;
+}
+
+function startTargetedRemedialQuiz() {
+  const quizArea = document.getElementById('student-syllabus-quiz-area');
+  if (!quizArea || !window._lastRemedialQuizQuestions || !window._lastRemedialQuizQuestions.length) {
+    alert("Targeted questions generated!");
+    return;
+  }
+
+  currentSyllabusQuiz = window._lastRemedialQuizQuestions;
+  currentSyllabusQuizAnswers = {};
+
+  quizArea.style.display = 'block';
+  quizArea.innerHTML = `
+    <div style="margin-bottom:16px;padding:12px;background:#fffbeb;border-radius:10px;border:1px solid #fde68a">
+      <div style="font-weight:800;font-size:15px;color:#92400e">🚀 AI Targeted Practice Quiz</div>
+      <div style="font-size:12px;color:#78350f">This quiz focuses specifically on the weak sub-topics identified during your previous test.</div>
+    </div>
+
+    ${currentSyllabusQuiz.map((q, idx) => `
+      <div style="padding:14px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;margin-bottom:14px">
+        <div style="font-weight:700;font-size:14px;color:#1e1b4b;margin-bottom:10px">Q${idx + 1}. ${q.q}</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          ${q.opts.map((opt, optIdx) => `
+            <label style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:#fff;border:1px solid #cbd5e1;border-radius:8px;cursor:pointer;font-size:13px">
+              <input type="radio" name="rem_q_${idx}" value="${optIdx}" onchange="currentSyllabusQuizAnswers[${idx}]=${optIdx}">
+              <span>${opt}</span>
+            </label>
+          `).join('')}
+        </div>
+      </div>
+    `).join('')}
+
+    <button class="btn btn-indigo" style="width:100%;margin-top:10px" onclick="submitSyllabusQuiz()">
+      🧠 Evaluate Practice Quiz
+    </button>
+  `;
 }
 
 // ── REAL-TIME INTERNSHIPS (STUDENT VIEW) ───────────

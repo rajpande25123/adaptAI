@@ -9,6 +9,8 @@ import streamlit as st
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from data.internship_store import internship_store
+from data.syllabus_store import syllabus_store
+from assessment.ai_syllabus_engine import AISyllabusEngine
 
 # ── STREAMLIT PAGE CONFIG ────────────────────────────────
 st.set_page_config(
@@ -59,7 +61,7 @@ st.sidebar.markdown("**Multimodal Student Learning Platform**")
 
 role = st.sidebar.radio(
     "🔑 Select Dashboard Portal:",
-    ["🎓 Student Portal", "👨‍🏫 Teacher Portal", "🏛️ HOD Portal", "💼 Live Internship Opportunities", "🔍 AI Gap Analyzer"]
+    ["🎓 Student Portal", "📚 Syllabus & AI Quiz Generator", "👨‍🏫 Teacher Portal", "🏛️ HOD Portal", "💼 Live Internship Opportunities", "🔍 AI Gap Analyzer"]
 )
 
 st.sidebar.markdown("---")
@@ -98,6 +100,67 @@ if role == "🎓 Student Portal":
                 st.link_button("🚀 Apply Now", item.get('apply_url', '#'))
     else:
         st.info("No active internships currently posted.")
+
+# ── 1.5 SYLLABUS & AI QUIZ GENERATOR ─────────────────────
+elif role == "📚 Syllabus & AI Quiz Generator":
+    st.markdown('<div class="main-header">📚 Syllabus Curriculum & AI Diagnostic Engine</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sub-header">Select a syllabus unit to auto-generate diagnostic quizzes, detailed topic explanations, and targeted remedial practice quizzes.</div>', unsafe_allow_html=True)
+
+    syllabi = syllabus_store.get_all()
+    if syllabi:
+        syl = syllabi[0]
+        st.subheader(f"📖 {syl['title']} ({syl.get('code', 'CS-101')})")
+        st.caption(f"Department: {syl.get('department')} | Author: {syl.get('author')}")
+        st.write(syl.get('description', ''))
+
+        col1, col2 = st.columns([1, 1])
+        with col1:
+            st.markdown("### 📜 Units in Syllabus:")
+            selected_unit_idx = st.radio(
+                "Choose a unit:",
+                range(len(syl['units'])),
+                format_func=lambda i: syl['units'][i]['title']
+            )
+            unit = syl['units'][selected_unit_idx]
+            st.info(f"**Unit Overview:** {unit.get('description')}")
+            st.write("**Target Learning Goals:**")
+            for goal in unit.get('learning_goals', []):
+                st.write(f"- {goal}")
+
+        with col2:
+            st.markdown("### 🧠 AI Unit Quiz & Remedial Loop")
+            if st.button("⚡ Generate AI Unit Quiz", key=f"gen_{unit['unit_id']}"):
+                quiz_q = AISyllabusEngine.generate_unit_quiz(unit, num_questions=4)
+                st.session_state['active_syl_quiz'] = quiz_q
+                st.session_state['active_syl_unit_title'] = unit['title']
+
+            if 'active_syl_quiz' in st.session_state and st.session_state['active_syl_quiz']:
+                st.markdown(f"#### Quiz: {st.session_state.get('active_syl_unit_title', 'Unit')}")
+                user_answers = {}
+                with st.form("syl_quiz_form"):
+                    for idx, q in enumerate(st.session_state['active_syl_quiz']):
+                        user_answers[idx] = st.radio(f"**Q{idx+1}. {q['q']}**", range(len(q['opts'])), format_func=lambda i, opts=q['opts']: opts[i], key=f"sq_{idx}")
+                    
+                    sub = st.form_submit_button("🧠 Evaluate & Generate Remedial Lesson")
+                    if sub:
+                        res = AISyllabusEngine.evaluate_quiz_and_generate_remedial(st.session_state['active_syl_quiz'], user_answers)
+                        st.session_state['syl_quiz_result'] = res
+
+            if 'syl_quiz_result' in st.session_state:
+                res = st.session_state['syl_quiz_result']
+                st.markdown("---")
+                st.metric("Quiz Score", f"{res['score_pct']}%", f"{res['correct_count']}/{res['total_questions']} Correct")
+                
+                if res['needs_improvement'] and res['remedial_lessons']:
+                    st.warning("### 💡 AI Topic Explanation & Learning Breakdown")
+                    for lesson in res['remedial_lessons']:
+                        st.error(f"**{lesson['title']}**")
+                        st.write(lesson['explanation'])
+                        st.code(f"Formula: {lesson['formula']}", language="python")
+                    
+                    st.success("🎯 Follow-Up Targeted Practice Quiz generated for student improvement!")
+                else:
+                    st.success("🎉 Excellent mastery of this syllabus unit!")
 
 # ── 2. TEACHER PORTAL ────────────────────────────────────
 elif role == "👨‍🏫 Teacher Portal":

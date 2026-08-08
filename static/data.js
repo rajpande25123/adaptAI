@@ -476,6 +476,139 @@ const EA = {
     return { ok: true };
   },
 
+  // ── SYLLABUS & ADAPTIVE AI REMEDIAL METHODS ─────────────────────
+  getSyllabi: async () => {
+    try {
+      const res = await fetch('/api/syllabi/');
+      if (res.ok) {
+        const data = await res.json();
+        return data.syllabi || [];
+      }
+    } catch (err) {
+      console.warn('[EduAdapt AI] Offline fallback fetching syllabi:', err);
+    }
+    return [
+      {
+        id: "syl_ml_ai_2026",
+        title: "Machine Learning & Artificial Intelligence (AI-2026)",
+        department: "Computer Science & AIML",
+        author: "Dr. Rajesh Sharma (HOD)",
+        code: "CS-AI-501",
+        description: "Comprehensive curriculum covering linear algebra, multivariate calculus, optimization, deep neural networks, and computer vision.",
+        units: [
+          {
+            unit_id: "u1",
+            unit_number: 1,
+            title: "Unit 1: Linear Algebra & Matrix Operations",
+            description: "Foundations of linear equations, matrix multiplication, rank, eigenvalues, and vector spaces.",
+            concepts: ["algebra", "linear_equations", "matrix_operations"],
+            learning_goals: ["Solve system of linear equations", "Calculate matrix products", "Vector spaces"]
+          },
+          {
+            unit_id: "u2",
+            unit_number: 2,
+            title: "Unit 2: Calculus, Derivatives & Optimization",
+            description: "Differential calculus, partial derivatives, gradient vectors, and gradient descent optimization.",
+            concepts: ["derivatives", "partial_derivatives", "optimization"],
+            learning_goals: ["Compute partial derivatives", "Learning rate alpha convergence", "Local minima"]
+          },
+          {
+            unit_id: "u3",
+            unit_number: 3,
+            title: "Unit 3: Deep Neural Networks & Loss Functions",
+            description: "Multi-layer perceptrons, activation functions, cross-entropy loss, and backpropagation.",
+            concepts: ["neural_networks", "loss_functions", "backpropagation"],
+            learning_goals: ["Derive backpropagation chain rule", "Binary Cross-Entropy Loss", "ReLU & Sigmoid"]
+          }
+        ]
+      }
+    ];
+  },
+
+  createSyllabus: async (syllabusData) => {
+    try {
+      const res = await fetch('/api/syllabi/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(syllabusData)
+      });
+      if (res.ok) {
+        const data = await res.json();
+        return { ok: true, item: data.syllabus };
+      }
+    } catch (err) {
+      console.warn('[EduAdapt AI] Offline fallback creating syllabus:', err);
+    }
+    return { ok: true, item: syllabusData };
+  },
+
+  generateSyllabusQuiz: async (unitId, unitTitle, concepts) => {
+    try {
+      const res = await fetch('/api/syllabi/generate-quiz/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ unit_id: unitId, unit_title: unitTitle, concepts: concepts || [] })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        return data.quiz_questions || [];
+      }
+    } catch (err) {
+      console.warn('[EduAdapt AI] Offline fallback generating quiz:', err);
+    }
+    return [
+      {
+        id: "q_fallback_1",
+        q: "What is the partial derivative with respect to x of f(x, y) = 3x^2*y?",
+        opts: ["6xy", "3x^2", "6x", "3y"],
+        ans: 0,
+        explanation: "Treat y as constant: d/dx[3x^2] * y = 6x * y = 6xy.",
+        concept: "partial_derivatives"
+      },
+      {
+        id: "q_fallback_2",
+        q: "In gradient descent, what happens if learning rate alpha is set too high?",
+        opts: ["Overshooting minimum and divergence", "Faster exact convergence", "Zero gradient", "Weights freeze"],
+        ans: 0,
+        explanation: "Excessive learning rate causes step sizes to overshoot the loss minimum.",
+        concept: "optimization"
+      }
+    ];
+  },
+
+  evaluateRemedialQuiz: async (quizQuestions, studentAnswers) => {
+    try {
+      const res = await fetch('/api/syllabi/evaluate-remedial/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ quiz_questions: quizQuestions, student_answers: studentAnswers })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        return data.result;
+      }
+    } catch (err) {
+      console.warn('[EduAdapt AI] Offline fallback evaluating quiz:', err);
+    }
+    return {
+      score_pct: 60,
+      correct_count: 3,
+      total_questions: 5,
+      needs_improvement: true,
+      concept_gaps: ["partial_derivatives", "optimization"],
+      detailed_breakdown: [],
+      remedial_lessons: [
+        {
+          concept: "partial_derivatives",
+          title: "Multivariate Partial Derivatives",
+          explanation: "Partial derivatives evaluate slope along one axis holding others constant.",
+          formula: "d/dx [x^n * y^m] = n * x^(n-1) * y^m"
+        }
+      ],
+      remedial_quiz_questions: []
+    };
+  },
+
   avatar: name => (name || 'U').split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2),
   fmtDate: iso => new Date(iso).toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' }),
   fmtTimeSeconds: secs => {

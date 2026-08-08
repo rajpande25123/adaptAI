@@ -18,6 +18,7 @@
       <button class="nav-link" onclick="showPage('qa')"><span class="nav-icon">💬</span> Q & A / Doubt Forum</button>
       <button class="nav-link" onclick="showPage('report')"><span class="nav-icon">📋</span> My Academic Report</button>
       <button class="nav-link" onclick="showPage('quizzes')"><span class="nav-icon">✏️</span> Quizzes</button>
+      <button class="nav-link" onclick="showPage('syllabus')"><span class="nav-icon">📚</span> Syllabus & AI Path</button>
       <button class="nav-link" onclick="showPage('internships')"><span class="nav-icon">🎓</span> Internship Opportunities</button>
       <button class="nav-link" onclick="showPage('analyzer')"><span class="nav-icon">🔍</span> AI Gap Analyzer</button>
       <button class="nav-link" onclick="showPage('profile')"><span class="nav-icon">👤</span> My Profile</button>
@@ -267,6 +268,34 @@
         <button class="btn btn-outline btn-sm" onclick="EA.logout()">🚪 Return to Login</button>
       </div>
       <div id="profile-content"></div>
+    <!-- PAGE: SYLLABUS & ADAPTIVE AI PATH -->
+    <div id="page-syllabus" class="page">
+      <div class="header-sm">
+        <div>
+          <h2 style="font-size:22px;font-weight:800;color:#1e1b4b">📚 Course Syllabus & Adaptive AI Learning Path</h2>
+          <p style="color:#64748b;font-size:13px;margin-top:2px">Interactive unit-wise curriculum. Click any unit to auto-generate an AI diagnostic quiz and remedial explanation loop!</p>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:16px">
+        <!-- Left: Syllabus Units List -->
+        <div>
+          <div class="card-title">📖 Curriculum Syllabus Units</div>
+          <div id="student-syllabus-container">
+            <div style="text-align:center;padding:30px;color:#64748b">Loading curriculum syllabus...</div>
+          </div>
+        </div>
+
+        <!-- Right: AI Quiz Player & Remedial Explanation Panel -->
+        <div>
+          <div class="card" id="student-syllabus-quiz-card">
+            <div class="card-title">🧠 AI Unit Diagnostic & Remedial Engine</div>
+            <div id="student-syllabus-quiz-area" style="min-height:300px;display:flex;align-items:center;justify-content:center;color:#64748b;font-size:13px;text-align:center;padding:20px">
+              👈 Select any unit from the syllabus on the left and click "⚡ Generate AI Diagnostic Quiz" to begin!
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
   </main>

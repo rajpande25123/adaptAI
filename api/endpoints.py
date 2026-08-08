@@ -6,12 +6,13 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from api.schemas import (
-    MultimodalDiagnosisRequest,
-    AdaptiveQuizGenerateRequest,
-    AdaptiveQuizSubmitRequest,
-    InternshipPostRequest
+    LearningRequest, LearningResponse, MultimodalDiagnosisRequest,
+    AdaptiveQuizGenerateRequest, AdaptiveQuizSubmitRequest, InternshipPostRequest,
+    SyllabusCreateRequest, SyllabusQuizGenerateRequest, SyllabusQuizEvaluateRequest
 )
 from data.internship_store import internship_store
+from data.syllabus_store import syllabus_store
+from assessment.ai_syllabus_engine import AISyllabusEngine
 
 class EduAdaptAPI:
     def __init__(self, learning_platform):
@@ -169,6 +170,52 @@ class EduAdaptAPI:
                 raise HTTPException(status_code=404, detail="Internship not found")
             except Exception as e:
                 raise HTTPException(status_code=500, detail=str(e))
+
+        # ── SYLLABUS & ADAPTIVE AI REMEDIAL ENDPOINTS ─────────
+        @self.app.get("/api/syllabi/")
+        async def list_syllabi():
+            """Fetch list of all course syllabi."""
+            try:
+                syllabi = syllabus_store.get_all()
+                return JSONResponse(content={"status": "success", "syllabi": syllabi})
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
+        @self.app.post("/api/syllabi/")
+        async def create_syllabus(request: SyllabusCreateRequest):
+            """Create/Add a new course syllabus."""
+            try:
+                item = syllabus_store.create(request.dict())
+                return JSONResponse(content={"status": "success", "message": "Syllabus created successfully!", "syllabus": item})
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
+        @self.app.post("/api/syllabi/generate-quiz/")
+        async def generate_syllabus_quiz(request: SyllabusQuizGenerateRequest):
+            """Generate an AI Quiz automatically for a syllabus unit."""
+            try:
+                unit = {
+                    "unit_id": request.unit_id,
+                    "title": request.unit_title,
+                    "concepts": request.concepts
+                }
+                questions = AISyllabusEngine.generate_unit_quiz(unit, request.num_questions)
+                return JSONResponse(content={"status": "success", "quiz_questions": questions})
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
+        @self.app.post("/api/syllabi/evaluate-remedial/")
+        async def evaluate_remedial(request: SyllabusQuizEvaluateRequest):
+            """Evaluate quiz answers and auto-generate AI Topic Explanation + Remedial Improvement Quiz."""
+            try:
+                result = AISyllabusEngine.evaluate_quiz_and_generate_remedial(
+                    request.quiz_questions,
+                    request.student_answers
+                )
+                return JSONResponse(content={"status": "success", "result": result})
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
 
 
     def run(self, host: str = "0.0.0.0", port: int = 8000):

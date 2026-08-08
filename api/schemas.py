@@ -53,3 +53,22 @@ class InternshipPostRequest(BaseModel):
     description: str
     apply_url: Optional[str] = "#"
     posted_by: Optional[str] = "Faculty / HOD"
+
+class SyllabusCreateRequest(BaseModel):
+    title: str
+    code: Optional[str] = "CS-101"
+    department: Optional[str] = "Computer Science"
+    author: Optional[str] = "Faculty"
+    description: Optional[str] = ""
+    units: List[Dict[str, Any]]
+
+class SyllabusQuizGenerateRequest(BaseModel):
+    unit_id: str
+    unit_title: str
+    concepts: List[str]
+    num_questions: Optional[int] = 5
+
+class SyllabusQuizEvaluateRequest(BaseModel):
+    student_id: Optional[str] = "student_001"
+    quiz_questions: List[Dict[str, Any]]
+    student_answers: Dict[str, Any]

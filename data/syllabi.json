@@ -1,0 +1,77 @@
+[
+  {
+    "id": "syl_ml_ai_2026",
+    "title": "Machine Learning & Artificial Intelligence (AI-2026)",
+    "department": "Computer Science & AIML",
+    "author": "Dr. Rajesh Sharma (HOD)",
+    "code": "CS-AI-501",
+    "description": "Comprehensive curriculum covering linear algebra, multivariate calculus, optimization, deep neural networks, and computer vision.",
+    "units": [
+      {
+        "unit_id": "u1",
+        "unit_number": 1,
+        "title": "Unit 1: Linear Algebra & Matrix Operations",
+        "description": "Foundations of linear equations, matrix multiplication, rank, eigenvalues, and vector spaces.",
+        "concepts": [
+          "algebra",
+          "linear_equations",
+          "matrix_operations"
+        ],
+        "learning_goals": [
+          "Solve system of linear equations using matrix inverse",
+          "Calculate matrix products and determinants",
+          "Understand geometric interpretation of vectors"
+        ]
+      },
+      {
+        "unit_id": "u2",
+        "unit_number": 2,
+        "title": "Unit 2: Calculus, Derivatives & Optimization",
+        "description": "Differential calculus, partial derivatives, gradient vectors, and gradient descent optimization.",
+        "concepts": [
+          "derivatives",
+          "partial_derivatives",
+          "optimization"
+        ],
+        "learning_goals": [
+          "Compute partial derivatives of multivariable cost functions",
+          "Analyze effect of learning rate alpha on convergence",
+          "Identify local minima and saddle points"
+        ]
+      },
+      {
+        "unit_id": "u3",
+        "unit_number": 3,
+        "title": "Unit 3: Deep Neural Networks & Loss Functions",
+        "description": "Multi-layer perceptrons, non-linear activation functions, cross-entropy loss, and backpropagation.",
+        "concepts": [
+          "neural_networks",
+          "loss_functions",
+          "backpropagation"
+        ],
+        "learning_goals": [
+          "Derive backpropagation weight updates using chain rule",
+          "Compare Binary Cross-Entropy vs Mean Squared Error",
+          "Select appropriate activation functions (ReLU, Sigmoid, Softmax)"
+        ]
+      },
+      {
+        "unit_id": "u4",
+        "unit_number": 4,
+        "title": "Unit 4: Computer Vision & Transformer Architectures",
+        "description": "Convolutional neural networks, feature maps, self-attention mechanisms, and transformer encoders.",
+        "concepts": [
+          "computer_vision",
+          "nlp",
+          "transformers"
+        ],
+        "learning_goals": [
+          "Understand spatial convolutions and max pooling operations",
+          "Explain scaled dot-product self-attention mechanism",
+          "Apply pre-trained models for downstream vision and text tasks"
+        ]
+      }
+    ],
+    "created_at": "2026-08-08 12:00"
+  }
+]
