@@ -19,6 +19,7 @@
       <button class="nav-link" onclick="showPage('qa')"><span class="nav-icon">💬</span> Student Q & A Hub</button>
       <button class="nav-link" onclick="showPage('marks')"><span class="nav-icon">📝</span> Enter Marks</button>
       <button class="nav-link" onclick="showPage('quizzes')"><span class="nav-icon">❓</span> Create Quiz</button>
+      <button class="nav-link" onclick="showPage('syllabus-upload')"><span class="nav-icon">📚</span> Upload Syllabus</button>
       <button class="nav-link" onclick="showPage('results')"><span class="nav-icon">📈</span> Quiz Results</button>
       <button class="nav-link" onclick="showPage('internships')"><span class="nav-icon">💼</span> Share Internships</button>
     </nav>
@@ -155,6 +156,30 @@
       </div>
       <div class="grid-2">
         <div class="card">
+          <!-- AI SYLLABUS QUIZ GENERATOR WIDGET -->
+          <div style="padding:14px;background:#eef2ff;border:1.5px solid #c7d2fe;border-radius:12px;margin-bottom:18px">
+            <div style="font-weight:800;font-size:14px;color:#1e1b4b;margin-bottom:4px;display:flex;align-items:center;gap:6px">
+              🧠 Auto-Generate Quiz from Course Syllabus
+            </div>
+            <div style="font-size:12px;color:#4338ca;margin-bottom:10px">Select a unit to automatically generate AI diagnostic questions complete with remedial explanations:</div>
+            
+            <div class="field-sm" style="margin-bottom:10px">
+              <label style="color:#334155;font-weight:700">Select Syllabus Unit</label>
+              <select id="syl-quiz-unit-sel" style="width:100%;padding:8px 10px;border:1px solid #cbd5e1;border-radius:8px;font-size:13px;font-family:inherit">
+                <option value="u1">Unit 1: Linear Algebra & Differential Calculus Foundations</option>
+                <option value="u2">Unit 2: Deep Neural Networks & Loss Minimization</option>
+                <option value="u3">Unit 3: Computer Vision & Transformer Architectures</option>
+              </select>
+            </div>
+
+            <button type="button" class="btn btn-indigo btn-sm" style="width:100%" onclick="autoGenerateQuizFromSyllabus()">
+              ⚡ Auto-Fill Questions from Selected Syllabus Unit
+            </button>
+            <div id="syl-gen-msg" class="hidden" style="margin-top:8px;padding:8px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;color:#166534;font-size:12px">
+              ✓ 5 AI questions generated from Syllabus Unit! Review or modify them below before publishing.
+            </div>
+          </div>
+
           <div class="card-title">Quiz Details</div>
           <div class="field-sm"><label>Quiz Title</label><input id="qz-title" placeholder="e.g. Unit Test 1 — Machine Learning"></div>
           <div class="field-sm"><label>Subject</label><input id="qz-subject" placeholder="e.g. Machine Learning"></div>
@@ -281,6 +306,68 @@
         <div class="card">
           <div class="card-title">📋 Active Department Internships</div>
           <div id="teacher-internships-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ TEACHER SYLLABUS UPLOAD ══ -->
+    <div id="page-syllabus-upload" class="page">
+      <div class="page-header">
+        <h2 style="font-size:22px;font-weight:800;color:#1e1b4b">📚 Course Syllabus Upload & AI Quiz System</h2>
+        <p style="color:#64748b;font-size:13px;margin-top:2px">Upload or paste course syllabus units. EduAdapt AI will automatically generate diagnostic quizzes and adaptive remedial learning loops for students!</p>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:16px">
+        <!-- Syllabus Form -->
+        <div class="card">
+          <div class="card-title">📖 Upload New Syllabus & Unit 1 Curriculum</div>
+          <form onsubmit="handleTeacherUploadSyllabus(event)">
+            <div class="field-sm">
+              <label>Syllabus / Subject Title *</label>
+              <input id="syl-title" placeholder="e.g. Artificial Intelligence & Machine Learning 2026" required>
+            </div>
+            <div class="field-row">
+              <div class="field-sm">
+                <label>Course Code</label>
+                <input id="syl-code" placeholder="e.g. CS-AI-501" value="CS-AI-501">
+              </div>
+              <div class="field-sm">
+                <label>Department</label>
+                <input id="syl-dept" placeholder="e.g. Computer Science" value="Computer Science">
+              </div>
+            </div>
+
+            <div style="padding:14px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;margin:12px 0">
+              <div style="font-weight:700;font-size:14px;color:#1e1b4b;margin-bottom:8px">📌 Unit 1 Details</div>
+              <div class="field-sm">
+                <label>Unit 1 Title *</label>
+                <input id="syl-u1-title" placeholder="e.g. Unit 1: Linear Algebra & Differential Calculus Foundations" value="Unit 1: Linear Algebra & Differential Calculus Foundations" required>
+              </div>
+              <div class="field-sm">
+                <label>Unit 1 Description *</label>
+                <input id="syl-u1-desc" placeholder="e.g. Matrix operations, partial derivatives, and gradient vectors" value="Foundations of linear equations, matrix operations, partial derivatives, and gradient vectors." required>
+              </div>
+              <div class="field-sm">
+                <label>Target AI Concepts (comma separated) *</label>
+                <input id="syl-u1-concepts" placeholder="algebra, derivatives, partial_derivatives, optimization" value="algebra, derivatives, partial_derivatives, optimization" required>
+              </div>
+              <div class="field-sm">
+                <label>Target Learning Goals (comma separated)</label>
+                <input id="syl-u1-goals" placeholder="Compute partial derivatives, Calculate matrix products, Optimize cost functions" value="Compute partial derivatives, Calculate matrix products, Optimize cost functions">
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-indigo btn-full">🚀 Publish Syllabus to Students & Enable AI Quizzes</button>
+            <div id="syl-pub-msg" class="hidden" style="margin-top:10px;padding:10px;background:#ecfdf5;border-radius:8px;color:#065f46;font-size:13px">✓ Syllabus uploaded and active for AI quiz generation!</div>
+          </form>
+        </div>
+
+        <!-- Current Active Syllabi List -->
+        <div class="card">
+          <div class="card-title">📚 Active Syllabi & AI Quizzes</div>
+          <div id="teacher-syllabi-list">
+            <div style="text-align:center;padding:30px;color:#64748b">Loading active syllabi...</div>
+          </div>
         </div>
       </div>
     </div>

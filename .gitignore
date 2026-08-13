@@ -7,6 +7,18 @@ __pycache__/
 venv/
 ENV/
 .env
+.env.local
 .idea/
 .vscode/
 .DS_Store
+
+# SQLite database (don't commit local DB)
+*.db
+*.sqlite
+*.sqlite3
+
+# Vercel
+.vercel/
+
+# Node (if any)
+node_modules/

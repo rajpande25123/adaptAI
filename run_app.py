@@ -33,8 +33,17 @@ def main():
     print(f"  🌐 Local Access:   http://localhost:8000")
     print(f"  📱 Network Access: http://{local_ip}:8000")
     print("=" * 65)
-    print("  💡 Connect up to 3+ devices on the same Wi-Fi network to test")
-    print("     HOD, Teacher, and Student real-time internship broadcasts!")
+
+    # ── Initialize Production Database ───────────────────────────────────
+    # Creates SQLite database file (eduadapt.db) with all tables and demo data.
+    # Safe to run multiple times — skips seed if data already exists.
+    print("  🗄️  Initializing database...")
+    try:
+        from database.init_db import init_db
+        init_db()
+        print("  ✅ Database ready.")
+    except Exception as e:
+        print(f"  ⚠️  Database init warning: {e}")
     print("=" * 65)
 
     config_file = os.path.join(os.path.dirname(__file__), "configs", "default.yaml")

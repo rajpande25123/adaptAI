@@ -150,6 +150,36 @@ class AISyllabusEngine:
     """Engine to auto-generate syllabus unit quizzes and adaptive remedial learning loops."""
 
     @staticmethod
+    def get_random_mcq_quiz(num_questions: int = 5) -> List[Dict[str, Any]]:
+        """Fetch 5 random MCQs from the syllabus MCQ dataset file."""
+        import os
+        import json
+        file_path = os.path.join(os.path.dirname(__file__), "..", "data", "syllabus_mcq_bank.json")
+        questions = []
+        try:
+            with open(file_path, "r", encoding="utf-8") as f:
+                questions = json.load(f)
+        except Exception:
+            pass
+        
+        if not questions:
+            for c, data in CONCEPT_REMEDIAL_KNOWLEDGE.items():
+                questions.extend(data["questions"])
+
+        selected = random.sample(questions, min(num_questions, len(questions)))
+        formatted = []
+        for idx, q in enumerate(selected):
+            formatted.append({
+                "id": f"q_mcq_{idx+1}_{int(time.time())}",
+                "q": q["q"],
+                "opts": q["opts"],
+                "ans": q["ans"],
+                "explanation": q["explanation"],
+                "concept": q.get("concept", "general")
+            })
+        return formatted
+
+    @staticmethod
     def generate_unit_quiz(unit: Dict[str, Any], num_questions: int = 5) -> List[Dict[str, Any]]:
         concepts = unit.get("concepts", ["derivatives", "optimization"])
         questions = []

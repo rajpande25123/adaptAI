@@ -294,34 +294,94 @@ async function renderStudentSyllabus() {
     return;
   }
 
-  const syl = syllabi[0];
-  container.innerHTML = `
-    <div style="padding:16px;background:#eef2ff;border:1px solid #c7d2fe;border-radius:12px;margin-bottom:16px">
-      <div style="font-weight:800;font-size:16px;color:#1e1b4b">${syl.title}</div>
-      <div style="font-size:12px;color:#4338ca;margin-top:2px">Code: <strong>${syl.code}</strong> · ${syl.department} · Author: ${syl.author}</div>
-      <div style="font-size:12px;color:#475569;margin-top:6px">${syl.description}</div>
+  let html = '';
+  let firstUnit = null;
+
+  syllabi.forEach((syl, sylIdx) => {
+    html += `
+      <div style="padding:16px;background:#eef2ff;border:1px solid #c7d2fe;border-radius:12px;margin-bottom:16px">
+        <div style="font-weight:800;font-size:16px;color:#1e1b4b">${syl.title}</div>
+        <div style="font-size:12px;color:#4338ca;margin-top:2px">Code: <strong>${syl.code || 'CS-101'}</strong> · ${syl.department || 'CS'} · Author: ${syl.author || 'Faculty'}</div>
+        <div style="font-size:12px;color:#475569;margin-top:6px">${syl.description || ''}</div>
+      </div>
+    `;
+
+    (syl.units || []).forEach(u => {
+      if (!firstUnit) firstUnit = { u, sylTitle: syl.title };
+      const conceptsStr = (u.concepts || []).join(',');
+      const safeTitle = (u.title || 'Unit').replace(/'/g, "\\'");
+
+      html += `
+        <div class="card" style="margin-bottom:14px;border-left:4px solid #6366f1">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start">
+            <div>
+              <div style="font-weight:700;font-size:15px;color:#1e1b4b">${u.title || 'Unit'}</div>
+              <div style="font-size:12px;color:#64748b;margin-top:4px">${u.description || ''}</div>
+            </div>
+            <button class="btn btn-indigo btn-sm" style="white-space:nowrap" onclick="startSyllabusQuiz('${u.unit_id}', '${safeTitle}', '${conceptsStr}')">
+              ⚡ Start Unit AI Quiz
+            </button>
+          </div>
+
+          <div style="margin-top:12px;padding:10px;background:#f8fafc;border-radius:8px">
+            <div style="font-size:11px;font-weight:700;color:#475569;text-transform:uppercase;margin-bottom:4px">Target Learning Goals:</div>
+            <ul style="font-size:12px;color:#64748b;padding-left:16px;margin:0">
+              ${u.learning_goals ? u.learning_goals.map(g => `<li>${g}</li>`).join('') : '<li>Master core concepts</li>'}
+            </ul>
+          </div>
+        </div>
+      `;
+    });
+  });
+
+  container.innerHTML = html;
+
+  // Auto-launch Unit 1 Quiz into right pane if quiz is empty
+  const quizArea = document.getElementById('student-syllabus-quiz-area');
+  if (quizArea && firstUnit && (!currentSyllabusQuiz || !currentSyllabusQuiz.length)) {
+    const conceptsStr = (firstUnit.u.concepts || []).join(',');
+    startSyllabusQuiz(firstUnit.u.unit_id, firstUnit.u.title, conceptsStr);
+  }
+}
+
+async function startRandomMCQSyllabusQuiz() {
+  const quizArea = document.getElementById('student-syllabus-quiz-area');
+  if (!quizArea) return;
+
+  quizArea.innerHTML = '<div style="text-align:center;padding:40px;color:#64748b">🎯 Randomly selecting 5 MCQs from the 100-Question Syllabus Bank File...</div>';
+
+  currentSyllabusQuiz = await EA.getRandomMCQSyllabusQuiz();
+  currentSyllabusQuizAnswers = {};
+
+  if (!currentSyllabusQuiz || !currentSyllabusQuiz.length) {
+    quizArea.innerHTML = '<p class="text-muted">Failed to load MCQs.</p>';
+    return;
+  }
+
+  quizArea.style.display = 'block';
+  quizArea.innerHTML = `
+    <div style="margin-bottom:16px;padding-bottom:12px;border-bottom:1.5px solid #e2e8f0">
+      <div style="font-weight:800;font-size:16px;color:#1e1b4b">🎯 Random 5-MCQ Quiz (Selected from 100-Question Syllabus Bank)</div>
+      <div style="font-size:12px;color:#64748b">Complete the 5 questions below. AI will analyze your concept gaps upon submission.</div>
     </div>
 
-    ${syl.units.map(u => `
-      <div class="card" style="margin-bottom:14px;border-left:4px solid #6366f1">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start">
-          <div>
-            <div style="font-weight:700;font-size:15px;color:#1e1b4b">${u.title}</div>
-            <div style="font-size:12px;color:#64748b;margin-top:4px">${u.description}</div>
-          </div>
-          <button class="btn btn-indigo btn-sm" onclick="startSyllabusQuiz('${u.unit_id}', '${u.title.replace(/'/g, "\\'")}', '${u.concepts.join(',')}')">
-            ⚡ Generate AI Quiz
-          </button>
-        </div>
-
-        <div style="margin-top:12px;padding:10px;background:#f8fafc;border-radius:8px">
-          <div style="font-size:11px;font-weight:700;color:#475569;text-transform:uppercase;margin-bottom:4px">Target Learning Goals:</div>
-          <ul style="font-size:12px;color:#64748b;padding-left:16px;margin:0">
-            ${u.learning_goals ? u.learning_goals.map(g => `<li>${g}</li>`).join('') : '<li>Master core concepts</li>'}
-          </ul>
+    ${currentSyllabusQuiz.map((q, idx) => `
+      <div style="padding:14px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;margin-bottom:14px">
+        <div style="font-weight:700;font-size:14px;color:#1e1b4b;margin-bottom:10px">Q${idx + 1}. ${q.q}</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          ${q.opts.map((opt, optIdx) => `
+            <label style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:#fff;border:1px solid #cbd5e1;border-radius:8px;cursor:pointer;font-size:13px">
+              <input type="radio" name="rnd_q_${idx}" value="${optIdx}" onchange="currentSyllabusQuizAnswers[${idx}]=${optIdx}">
+              <span>${opt}</span>
+            </label>
+          `).join('')}
         </div>
       </div>
     `).join('')}
+
+    <button class="btn btn-indigo" style="width:100%;margin-top:10px" onclick="submitSyllabusQuiz()">
+      🧠 Submit & Generate AI Remedial Analysis
+    </button>
   `;
 }
 

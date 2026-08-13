@@ -26,6 +26,92 @@ function showPage(name) {
   if (name === 'analytics') renderTeacherAnalytics();
   if (name === 'qa') renderTeacherQA();
   if (name === 'internships') renderTeacherInternships();
+  if (name === 'syllabus-upload') renderTeacherSyllabi();
+}
+
+// ── TEACHER SYLLABUS UPLOAD & MANAGEMENT ───────────
+async function handleTeacherUploadSyllabus(e) {
+  e.preventDefault();
+  const title = document.getElementById('syl-title').value.trim();
+  const code = document.getElementById('syl-code').value.trim() || 'CS-101';
+  const dept = document.getElementById('syl-dept').value.trim() || 'Computer Science';
+
+  const u1Title = document.getElementById('syl-u1-title').value.trim();
+  const u1Desc = document.getElementById('syl-u1-desc').value.trim();
+  const u1ConceptsStr = document.getElementById('syl-u1-concepts').value.trim();
+  const u1GoalsStr = document.getElementById('syl-u1-goals').value.trim();
+
+  const concepts = u1ConceptsStr ? u1ConceptsStr.split(',').map(s => s.trim()) : ['algebra', 'derivatives', 'optimization'];
+  const goals = u1GoalsStr ? u1GoalsStr.split(',').map(s => s.trim()) : ['Master unit concepts'];
+
+  const syllabusData = {
+    title,
+    code,
+    department: dept,
+    author: `${session.name} (Faculty)`,
+    description: `Uploaded by ${session.name}. Includes Unit 1 diagnostic quiz generation capabilities.`,
+    units: [
+      {
+        unit_id: 'u1_' + Date.now(),
+        unit_number: 1,
+        title: u1Title,
+        description: u1Desc,
+        concepts: concepts,
+        learning_goals: goals
+      }
+    ]
+  };
+
+  const res = await EA.createSyllabus(syllabusData);
+  if (res.ok) {
+    // Also auto-generate and publish quiz for student dashboard Quizzes section
+    const generatedQ = await EA.generateSyllabusQuiz(syllabusData.units[0].unit_id, u1Title, concepts);
+    if (generatedQ && generatedQ.length) {
+      EA.createQuiz({
+        title: `Syllabus Quiz: ${u1Title}`,
+        subject: title,
+        targetYear: '',
+        targetDivision: '',
+        department: dept,
+        teacherId: session.id,
+        teacherName: session.name,
+        proctored: false,
+        questions: generatedQ.map(q => ({ q: q.q, opts: q.opts, ans: q.ans }))
+      });
+    }
+
+    document.getElementById('syl-title').value = '';
+    const msg = document.getElementById('syl-pub-msg');
+    if (msg) {
+      msg.classList.remove('hidden');
+      setTimeout(() => msg.classList.add('hidden'), 3500);
+    }
+    renderTeacherSyllabi();
+  }
+}
+
+async function renderTeacherSyllabi() {
+  const el = document.getElementById('teacher-syllabi-list');
+  if (!el) return;
+  el.innerHTML = '<div style="text-align:center;padding:30px;color:#64748b">Loading active syllabi...</div>';
+
+  const list = await EA.getSyllabi();
+  if (!list || !list.length) {
+    el.innerHTML = '<p class="text-muted" style="text-align:center;padding:30px">No syllabi uploaded yet.</p>';
+    return;
+  }
+
+  el.innerHTML = list.map(item => `
+    <div style="padding:14px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;margin-bottom:12px">
+      <div style="font-weight:700;font-size:15px;color:#1e1b4b">${item.title} (${item.code || 'CS-101'})</div>
+      <div style="font-size:12px;color:#64748b;margin-top:2px">Author: ${item.author || 'Faculty'} · Dept: ${item.department}</div>
+      <div style="margin-top:10px;padding:10px;background:#fff;border-radius:8px;border:1px solid #cbd5e1">
+        <div style="font-weight:700;font-size:13px;color:#4338ca">Unit 1: ${item.units[0]?.title || 'Unit 1'}</div>
+        <div style="font-size:12px;color:#64748b;margin-top:2px">${item.units[0]?.description || ''}</div>
+        <div style="font-size:11px;color:#059669;margin-top:4px">Concepts: ${(item.units[0]?.concepts || []).join(', ')}</div>
+      </div>
+    </div>
+  `).join('');
 }
 
 // ── TEACHER INTERNSHIPS MANAGEMENT ──────────────────
@@ -501,8 +587,50 @@ function saveMarks(id) {
   setTimeout(() => msg.classList.add('hidden'), 3000);
 }
 
-// ── QUIZ CREATION ──────────────────────────────────
+// ── QUIZ CREATION & AI SYLLABUS AUTO-GENERATION ──────
 let questions = [];
+
+async function autoGenerateQuizFromSyllabus() {
+  const sel = document.getElementById('syl-quiz-unit-sel');
+  const unitId = sel ? sel.value : 'u1';
+
+  const syllabi = await EA.getSyllabi();
+  let selectedUnit = null;
+  if (syllabi && syllabi.length && syllabi[0].units) {
+    selectedUnit = syllabi[0].units.find(u => u.unit_id === unitId) || syllabi[0].units[0];
+  }
+
+  if (!selectedUnit) {
+    selectedUnit = {
+      unit_id: 'u1',
+      title: 'Unit 1: Linear Algebra & Differential Calculus Foundations',
+      concepts: ['algebra', 'derivatives', 'partial_derivatives', 'optimization']
+    };
+  }
+
+  const generatedQ = await EA.generateSyllabusQuiz(selectedUnit.unit_id, selectedUnit.title, selectedUnit.concepts);
+
+  if (generatedQ && generatedQ.length) {
+    questions = generatedQ.map(g => ({
+      q: g.q,
+      opts: g.opts,
+      ans: g.ans
+    }));
+
+    const titleInput = document.getElementById('qz-title');
+    const subjInput = document.getElementById('qz-subject');
+    if (titleInput) titleInput.value = `AI Diagnostic Test — ${selectedUnit.title}`;
+    if (subjInput) subjInput.value = 'AI & Machine Learning';
+
+    renderQuestions();
+
+    const msg = document.getElementById('syl-gen-msg');
+    if (msg) {
+      msg.classList.remove('hidden');
+      setTimeout(() => msg.classList.add('hidden'), 4000);
+    }
+  }
+}
 
 function addQuestion() {
   questions.push({ q:'', opts:['','','',''], ans:0 });

@@ -129,10 +129,17 @@ elif role == "📚 Syllabus & AI Quiz Generator":
 
         with col2:
             st.markdown("### 🧠 AI Unit Quiz & Remedial Loop")
-            if st.button("⚡ Generate AI Unit Quiz", key=f"gen_{unit['unit_id']}"):
-                quiz_q = AISyllabusEngine.generate_unit_quiz(unit, num_questions=4)
-                st.session_state['active_syl_quiz'] = quiz_q
-                st.session_state['active_syl_unit_title'] = unit['title']
+            c_btn1, c_btn2 = st.columns(2)
+            with c_btn1:
+                if st.button("⚡ Generate AI Unit Quiz", key=f"gen_{unit['unit_id']}"):
+                    quiz_q = AISyllabusEngine.generate_unit_quiz(unit, num_questions=5)
+                    st.session_state['active_syl_quiz'] = quiz_q
+                    st.session_state['active_syl_unit_title'] = unit['title']
+            with c_btn2:
+                if st.button("🎯 Random 5 MCQs (From 100-Bank)", key="gen_rnd_100"):
+                    quiz_q = AISyllabusEngine.get_random_mcq_quiz(num_questions=5)
+                    st.session_state['active_syl_quiz'] = quiz_q
+                    st.session_state['active_syl_unit_title'] = "Random 5 MCQs (100-Question Syllabus Bank)"
 
             if 'active_syl_quiz' in st.session_state and st.session_state['active_syl_quiz']:
                 st.markdown(f"#### Quiz: {st.session_state.get('active_syl_unit_title', 'Unit')}")

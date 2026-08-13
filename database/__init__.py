@@ -1,0 +1,1 @@
+# EduAdapt AI database package

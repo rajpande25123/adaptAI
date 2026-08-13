@@ -1,0 +1,317 @@
+[
+  {
+    "id": "mcq_1",
+    "topic": "Linear Algebra",
+    "concept": "algebra",
+    "q": "What is the rank of an n x n identity matrix I_n?",
+    "opts": ["n", "1", "0", "n^2"],
+    "ans": 0,
+    "explanation": "The identity matrix has n linearly independent rows/columns, so its rank is n."
+  },
+  {
+    "id": "mcq_2",
+    "topic": "Linear Algebra",
+    "concept": "linear_equations",
+    "q": "If matrix A is invertible, what is the product A * A^(-1)?",
+    "opts": ["Identity Matrix I", "Zero Matrix O", "Matrix A", "Scalar 1"],
+    "ans": 0,
+    "explanation": "By definition, the product of a matrix and its inverse is the identity matrix I."
+  },
+  {
+    "id": "mcq_3",
+    "topic": "Linear Algebra",
+    "concept": "algebra",
+    "q": "What is the determinant of a 2x2 matrix [[a, b], [c, d]]?",
+    "opts": ["ad - bc", "ac - bd", "ab - cd", "ad + bc"],
+    "ans": 0,
+    "explanation": "The determinant of [[a, b], [c, d]] is computed as det = a*d - b*c."
+  },
+  {
+    "id": "mcq_4",
+    "topic": "Linear Algebra",
+    "concept": "linear_equations",
+    "q": "Which condition guarantees a system of linear equations Ax = b has a unique solution?",
+    "opts": ["det(A) != 0", "det(A) == 0", "A is non-square", "b = 0"],
+    "ans": 0,
+    "explanation": "A non-zero determinant implies matrix A is invertible, yielding unique solution x = A^(-1)b."
+  },
+  {
+    "id": "mcq_5",
+    "topic": "Linear Algebra",
+    "concept": "algebra",
+    "q": "If A is a 3x4 matrix and B is a 4x2 matrix, what is the dimension of A * B?",
+    "opts": ["3x2", "4x4", "3x4", "2x3"],
+    "ans": 0,
+    "explanation": "Multiplying (m x n) by (n x p) produces a matrix of size (m x p) = (3 x 2)."
+  },
+  {
+    "id": "mcq_6",
+    "topic": "Differential Calculus",
+    "concept": "derivatives",
+    "q": "What is the derivative of f(x) = x^4 - 3x^2 + 5?",
+    "opts": ["4x^3 - 6x", "4x^3 - 3x", "x^3 - 6x", "4x^2 - 6"],
+    "ans": 0,
+    "explanation": "Using the power rule: d/dx[x^4] = 4x^3, d/dx[-3x^2] = -6x, d/dx[5] = 0."
+  },
+  {
+    "id": "mcq_7",
+    "topic": "Differential Calculus",
+    "concept": "derivatives",
+    "q": "What is the derivative of e^(2x) with respect to x?",
+    "opts": ["2 * e^(2x)", "e^(2x)", "2x * e^(2x)", "0.5 * e^(2x)"],
+    "ans": 0,
+    "explanation": "Using the chain rule: d/dx[e^(u)] = e^u * du/dx = 2 * e^(2x)."
+  },
+  {
+    "id": "mcq_8",
+    "topic": "Differential Calculus",
+    "concept": "derivatives",
+    "q": "What is the derivative of ln(x) for x > 0?",
+    "opts": ["1/x", "x", "e^x", "1/x^2"],
+    "ans": 0,
+    "explanation": "The standard calculus derivative of natural logarithm ln(x) is 1/x."
+  },
+  {
+    "id": "mcq_9",
+    "topic": "Partial Derivatives",
+    "concept": "partial_derivatives",
+    "q": "Find ∂f/∂x for f(x, y) = 4x^3 * y^2 + 7y.",
+    "opts": ["12x^2 * y^2", "12x^2 * y^2 + 7", "4x^3 * 2y", "8x^3 * y"],
+    "ans": 0,
+    "explanation": "Treat y as constant. ∂/∂x [4x^3 * y^2] = 12x^2 * y^2 and ∂/∂x[7y] = 0."
+  },
+  {
+    "id": "mcq_10",
+    "topic": "Partial Derivatives",
+    "concept": "partial_derivatives",
+    "q": "Find ∂f/∂y for f(x, y) = 2x^2 * y + y^3.",
+    "opts": ["2x^2 + 3y^2", "4xy + 3y^2", "2x^2", "3y^2"],
+    "ans": 0,
+    "explanation": "Treat x as constant. ∂/∂y [2x^2 * y] = 2x^2 and ∂/∂y [y^3] = 3y^2."
+  },
+  {
+    "id": "mcq_11",
+    "topic": "Optimization",
+    "concept": "optimization",
+    "q": "In gradient descent, what direction does the negative gradient -∇f point toward?",
+    "opts": ["Steepest descent (local loss decrease)", "Steepest ascent", "Parallel to contours", "Random noise"],
+    "ans": 0,
+    "explanation": "The negative gradient points in the direction of maximum rate of loss decrease."
+  },
+  {
+    "id": "mcq_12",
+    "topic": "Optimization",
+    "concept": "optimization",
+    "q": "What parameter controls the step size taken during gradient descent updates?",
+    "opts": ["Learning rate alpha", "Batch size", "Momentum term", "Weight decay"],
+    "ans": 0,
+    "explanation": "The learning rate alpha determines the step size taken along the gradient direction."
+  },
+  {
+    "id": "mcq_13",
+    "topic": "Optimization",
+    "concept": "optimization",
+    "q": "What happens if learning rate alpha is too small in gradient descent?",
+    "opts": ["Convergence is extremely slow", "Loss diverges to infinity", "Overshooting minimum", "Zero loss immediately"],
+    "ans": 0,
+    "explanation": "A tiny learning rate requires thousands of micro-steps, leading to slow training."
+  },
+  {
+    "id": "mcq_14",
+    "topic": "Neural Networks",
+    "concept": "neural_networks",
+    "q": "What is the formula for the ReLU activation function?",
+    "opts": ["f(x) = max(0, x)", "f(x) = 1 / (1 + e^-x)", "f(x) = tanh(x)", "f(x) = x^2"],
+    "ans": 0,
+    "explanation": "ReLU (Rectified Linear Unit) outputs x if positive, else zero: max(0, x)."
+  },
+  {
+    "id": "mcq_15",
+    "topic": "Neural Networks",
+    "concept": "neural_networks",
+    "q": "Which range of values does the Sigmoid activation function output?",
+    "opts": ["(0, 1)", "(-1, 1)", "(0, infinity)", "(-infinity, infinity)"],
+    "ans": 0,
+    "explanation": "Sigmoid maps any real-valued number into a probability range between 0 and 1."
+  },
+  {
+    "id": "mcq_16",
+    "topic": "Loss Functions",
+    "concept": "loss_functions",
+    "q": "Which loss function is standard for multi-class classification outputted by Softmax?",
+    "opts": ["Categorical Cross-Entropy", "Mean Squared Error (MSE)", "Mean Absolute Error (MAE)", "Huber Loss"],
+    "ans": 0,
+    "explanation": "Categorical Cross-Entropy measures distance between true target one-hot vectors and Softmax probabilities."
+  },
+  {
+    "id": "mcq_17",
+    "topic": "Loss Functions",
+    "concept": "loss_functions",
+    "q": "What is Mean Squared Error (MSE) loss formula for N samples?",
+    "opts": ["(1/N) * Σ (y_true - y_pred)^2", "Σ |y_true - y_pred|", "- Σ y * log(p)", "max(0, 1 - y*p)"],
+    "ans": 0,
+    "explanation": "MSE computes the average squared difference between target values and model predictions."
+  },
+  {
+    "id": "mcq_18",
+    "topic": "Backpropagation",
+    "concept": "backpropagation",
+    "q": "Which mathematical rule is fundamental to computing gradients layer-by-layer in backpropagation?",
+    "opts": ["Chain Rule of Calculus", "L'Hopital's Rule", "Product Rule only", "Bayes Theorem"],
+    "ans": 0,
+    "explanation": "Backpropagation applies the Chain Rule to propagate loss derivatives backward through stacked layers."
+  },
+  {
+    "id": "mcq_19",
+    "topic": "Computer Vision",
+    "concept": "computer_vision",
+    "q": "What is the primary function of a Convolutional Filter (Kernel) in CNNs?",
+    "opts": ["Feature detection (edges, textures, shapes)", "Dimensionality reduction only", "Fully connected classification", "Adding bias terms"],
+    "ans": 0,
+    "explanation": "Convolutional filters slide over images to detect spatial patterns like edges and textures."
+  },
+  {
+    "id": "mcq_20",
+    "topic": "Computer Vision",
+    "concept": "computer_vision",
+    "q": "What operation reduces feature map spatial dimensions while retaining max activation?",
+    "opts": ["Max Pooling", "Batch Normalization", "Dropout", "Zero Padding"],
+    "ans": 0,
+    "explanation": "Max pooling extracts the maximum value from spatial windows, downsampling dimensions."
+  },
+  {
+    "id": "mcq_21",
+    "topic": "Transformers & NLP",
+    "concept": "transformers",
+    "q": "Which mechanism allows Transformers to weigh relationships between all tokens in a sequence?",
+    "opts": ["Self-Attention Mechanism", "Recurrent Hidden State", "Max Pooling", "Convolutional Kernel"],
+    "ans": 0,
+    "explanation": "Self-attention computes pairwise token compatibility scores across the entire sequence simultaneously."
+  },
+  {
+    "id": "mcq_22",
+    "topic": "Transformers & NLP",
+    "concept": "nlp",
+    "q": "In Transformer architectures, what vector representations are added to word embeddings to preserve word order?",
+    "opts": ["Positional Encodings", "One-hot encodings", "Bias vectors", "Gradient masks"],
+    "ans": 0,
+    "explanation": "Since attention is order-agnostic, Positional Encodings inject sequential order info into token embeddings."
+  },
+  {
+    "id": "mcq_23",
+    "topic": "Machine Learning Fundamentals",
+    "concept": "optimization",
+    "q": "What is Overfitting in machine learning?",
+    "opts": ["High training accuracy but low test accuracy", "Low training accuracy and low test accuracy", "High generalization on new data", "Zero training loss always"],
+    "ans": 0,
+    "explanation": "Overfitting occurs when a model memorizes noise in training data and fails to generalize to test data."
+  },
+  {
+    "id": "mcq_24",
+    "topic": "Machine Learning Fundamentals",
+    "concept": "optimization",
+    "q": "Which regularization technique randomly deactivates neurons during training to prevent co-adaptation?",
+    "opts": ["Dropout", "L2 Weight Decay", "Early Stopping", "Batch Normalization"],
+    "ans": 0,
+    "explanation": "Dropout randomly zeroes neuron activations during training, forcing robust feature representations."
+  },
+  {
+    "id": "mcq_25",
+    "topic": "Linear Algebra",
+    "concept": "algebra",
+    "q": "What is an Eigenvector of a square matrix A?",
+    "opts": ["A non-zero vector v such that A*v = lambda*v", "A vector with zero length", "The inverse of matrix A", "The transpose of A"],
+    "ans": 0,
+    "explanation": "An eigenvector v maintains its direction when multiplied by A, scaled only by eigenvalue scalar lambda."
+  },
+  {
+    "id": "mcq_26",
+    "topic": "Linear Algebra",
+    "concept": "algebra",
+    "q": "What is the trace of a square matrix?",
+    "opts": ["Sum of diagonal elements", "Product of diagonal elements", "Determinant of matrix", "Rank of matrix"],
+    "ans": 0,
+    "explanation": "The trace of a matrix is defined as the sum of its main diagonal entries."
+  },
+  {
+    "id": "mcq_27",
+    "topic": "Linear Algebra",
+    "concept": "linear_equations",
+    "q": "What is a Symmetric Matrix?",
+    "opts": ["A matrix equal to its transpose (A = A^T)", "A matrix with zero determinant", "A non-square matrix", "A matrix with all 1s"],
+    "ans": 0,
+    "explanation": "A square matrix is symmetric if it is equal to its transpose: A = A^T."
+  },
+  {
+    "id": "mcq_28",
+    "topic": "Differential Calculus",
+    "concept": "derivatives",
+    "q": "What is the derivative of f(x) = cos(x)?",
+    "opts": ["-sin(x)", "sin(x)", "tan(x)", "-cos(x)"],
+    "ans": 0,
+    "explanation": "The derivative of cos(x) with respect to x is -sin(x)."
+  },
+  {
+    "id": "mcq_29",
+    "topic": "Partial Derivatives",
+    "concept": "partial_derivatives",
+    "q": "What is the geometric meaning of the gradient vector ∇f(x,y)?",
+    "opts": ["Direction of steepest ascent of f", "Direction of zero slope", "Direction of steepest descent", "Contour line tangent"],
+    "ans": 0,
+    "explanation": "The gradient vector ∇f points directly in the direction of maximum rate of increase."
+  },
+  {
+    "id": "mcq_30",
+    "topic": "Optimization",
+    "concept": "optimization",
+    "q": "What is Stochastic Gradient Descent (SGD)?",
+    "opts": ["Updating weights using 1 random sample per step", "Updating weights using entire dataset per step", "Gradient descent with learning rate 1.0", "Non-differentiable loss solver"],
+    "ans": 0,
+    "explanation": "SGD updates model weights after evaluating loss on a single randomly selected training instance."
+  },
+  {
+    "id": "mcq_31",
+    "topic": "Neural Networks",
+    "concept": "neural_networks",
+    "q": "Which activation function is susceptible to the Vanishing Gradient problem for very deep networks?",
+    "opts": ["Sigmoid", "ReLU", "Leaky ReLU", "ELU"],
+    "ans": 0,
+    "explanation": "Sigmoid gradients saturate near 0 for high or low inputs, causing vanishing gradients."
+  },
+  {
+    "id": "mcq_32",
+    "topic": "Loss Functions",
+    "concept": "loss_functions",
+    "q": "What is Binary Cross-Entropy Loss formula for target y ∈ {0,1} and probability p?",
+    "opts": ["-[y * log(p) + (1-y) * log(1-p)]", "(y - p)^2", "|y - p|", "max(0, 1 - y*p)"],
+    "ans": 0,
+    "explanation": "BCE computes negative log likelihood for binary classification predictions."
+  },
+  {
+    "id": "mcq_33",
+    "topic": "Computer Vision",
+    "concept": "computer_vision",
+    "q": "What padding technique keeps spatial dimensions identical before and after convolution?",
+    "opts": ["Same Padding", "Valid Padding", "Zero Slicing", "Max Padding"],
+    "ans": 0,
+    "explanation": "Same padding adds zero borders so output height and width match input dimensions."
+  },
+  {
+    "id": "mcq_34",
+    "topic": "Transformers",
+    "concept": "transformers",
+    "q": "What are the 3 matrix inputs used to compute Self-Attention?",
+    "opts": ["Query (Q), Key (K), Value (V)", "Input, Hidden, Output", "Weights, Biases, Activation", "Kernel, Stride, Padding"],
+    "ans": 0,
+    "explanation": "Scaled dot-product attention computes Attention(Q, K, V) = softmax(QK^T / sqrt(d_k)) * V."
+  },
+  {
+    "id": "mcq_35",
+    "topic": "Machine Learning",
+    "concept": "optimization",
+    "q": "Which algorithm combines Momentum and RMSProp adaptive learning rates?",
+    "opts": ["Adam Optimizer", "Standard SGD", "Adagrad", "Newton-Raphson"],
+    "ans": 0,
+    "explanation": "Adam (Adaptive Moment Estimation) tracks both first moment (mean) and second moment (uncentered variance)."
+  }
+]
